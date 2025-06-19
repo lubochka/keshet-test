@@ -1,20 +1,20 @@
 import { Test } from '@nestjs/testing';
-import { AppService } from './app.service';
+import { WorkerPrismaService } from './workerprisma.service';
 
-describe('AppService', () => {
-  let service: AppService;
+describe('WorkerPrismaService', () => {
+  let service: WorkerPrismaService;
 
   beforeAll(async () => {
     const app = await Test.createTestingModule({
-      providers: [AppService],
+      providers: [WorkerPrismaService],
     }).compile();
 
-    service = app.get<AppService>(AppService);
+    service = app.get<WorkerPrismaService>(WorkerPrismaService);
   });
 
   describe('getData', () => {
     it('should return "Hello API"', () => {
-      expect(service.getData()).toEqual({ message: 'Hello API' });
+      expect(service.processQueue()).toEqual({ message: 'Hello API' });
     });
   });
 });

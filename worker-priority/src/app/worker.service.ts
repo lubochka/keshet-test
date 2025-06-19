@@ -6,6 +6,7 @@ export class WorkerService {
   private readonly logger = new Logger(WorkerService.name);
 
   // Store the last sync timestamp in memory (can be persisted)
+  //should be replaced to actual database last sync date and maybe even timestamp
   private lastSync = new Date(0); // Start at epoch for initial full sync
 
   async pollAndQueueInvoices() {
