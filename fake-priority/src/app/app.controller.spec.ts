@@ -1,20 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { InvoicesController } from './invoices.controller';
+import { InvoicesService } from './invoices.service';
 
-describe('AppController', () => {
+describe('InvoicesController', () => {
   let app: TestingModule;
 
   beforeAll(async () => {
     app = await Test.createTestingModule({
-      controllers: [AppController],
-      providers: [AppService],
+      controllers: [InvoicesController],
+      providers: [InvoicesService],
     }).compile();
   });
 
   describe('getData', () => {
     it('should return "Hello API"', () => {
-      const appController = app.get<AppController>(AppController);
+      const appController = app.get<InvoicesController>(InvoicesController);
       expect(appController.getData()).toEqual({ message: 'Hello API' });
     });
   });
