@@ -1,0 +1,26 @@
+{
+  "name": "@priority-lab/prisma-service-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@priority-lab/prisma-service"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "options": {
+          "jestConfig": "prisma-service-e2e/jest.config.ts",
+          "passWithNoTests": true
+        },
+        "dependsOn": [
+          "@priority-lab/prisma-service:build",
+          "@priority-lab/prisma-service:serve"
+        ]
+      }
+    }
+  }
+}

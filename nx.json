@@ -52,7 +52,16 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/priority-lab-e2e/**/*"]
+      "exclude": [
+        "apps/priority-lab-e2e/**/*",
+        "fake-auth-e2e/**/*",
+        "fake-priority-e2e/**/*",
+        "local-queue-e2e/**/*",
+        "worker-priority-e2e/**/*",
+        "worker-prisma-e2e/**/*",
+        "prisma-service-e2e/**/*",
+        "api-gateway-e2e/**/*"
+      ]
     }
   ],
   "targetDefaults": {

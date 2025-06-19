@@ -8,6 +8,48 @@
     },
     {
       "path": "./apps/priority-lab"
+    },
+    {
+      "path": "./fake-auth-e2e"
+    },
+    {
+      "path": "./fake-auth"
+    },
+    {
+      "path": "./fake-priority-e2e"
+    },
+    {
+      "path": "./fake-priority"
+    },
+    {
+      "path": "./local-queue-e2e"
+    },
+    {
+      "path": "./local-queue"
+    },
+    {
+      "path": "./worker-priority-e2e"
+    },
+    {
+      "path": "./worker-priority"
+    },
+    {
+      "path": "./worker-prisma-e2e"
+    },
+    {
+      "path": "./worker-prisma"
+    },
+    {
+      "path": "./prisma-service-e2e"
+    },
+    {
+      "path": "./prisma-service"
+    },
+    {
+      "path": "./api-gateway-e2e"
+    },
+    {
+      "path": "./api-gateway"
     }
   ]
 }

@@ -1,0 +1,26 @@
+{
+  "name": "@priority-lab/fake-auth-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@priority-lab/fake-auth"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "options": {
+          "jestConfig": "fake-auth-e2e/jest.config.ts",
+          "passWithNoTests": true
+        },
+        "dependsOn": [
+          "@priority-lab/fake-auth:build",
+          "@priority-lab/fake-auth:serve"
+        ]
+      }
+    }
+  }
+}
