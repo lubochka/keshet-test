@@ -1,15 +1,15 @@
 import { Test } from '@nestjs/testing';
-import { AppService } from './app.service';
+import { QueueService } from './queue.service';
 
-describe('AppService', () => {
-  let service: AppService;
+describe('QueueService', () => {
+  let service: QueueService;
 
   beforeAll(async () => {
     const app = await Test.createTestingModule({
-      providers: [AppService],
+      providers: [QueueService],
     }).compile();
 
-    service = app.get<AppService>(AppService);
+    service = app.get<QueueService>(QueueService);
   });
 
   describe('getData', () => {
