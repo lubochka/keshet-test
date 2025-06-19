@@ -1,12 +1,27 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Query, Req, Res, UseGuards, Param } from '@nestjs/common';
+import { AuthGuard } from './auth.guard';
+import { InvoicesService,InvoiceQueryDto } from './app.service';
+import type { Response } from 'express';
 
-@Controller()
-export class AppController {
-  constructor(private readonly appService: AppService) {}
+
+
+@Controller('invoices')
+@UseGuards(AuthGuard)
+export class InvoicesController {
+  constructor(private readonly invoicesService: InvoicesService) {}
 
   @Get()
-  getData() {
-    return this.appService.getData();
+  async listInvoices(@Query() query:InvoiceQueryDto) {
+    return this.invoicesService.listInvoices(query);
+  }
+
+  @Get(':id')
+  async getInvoice(@Param('id') id: string) {
+    return this.invoicesService.getInvoice(id);
+  }
+
+  @Get(':id/pdf')
+  async getInvoicePdf(@Param('id') id: string, @Res() res: Response) {
+    await this.invoicesService.getInvoicePdf(id, res);
   }
 }
