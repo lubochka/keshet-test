@@ -1,21 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { InvoicesController } from './invoice.controller';
+import { InvoiceService } from './invoice.service';
+import {PrismaService} from './prisma.service'
 
-describe('AppController', () => {
+describe('InvoicesController', () => {
   let app: TestingModule;
 
   beforeAll(async () => {
     app = await Test.createTestingModule({
-      controllers: [AppController],
-      providers: [AppService],
+      controllers: [InvoicesController],
+      providers: [InvoiceService,PrismaService],
     }).compile();
   });
 
   describe('getData', () => {
     it('should return "Hello API"', () => {
-      const appController = app.get<AppController>(AppController);
-      expect(appController.getData()).toEqual({ message: 'Hello API' });
+      const appController = app.get<InvoicesController>(InvoicesController);
+      expect(appController.getInvoices()).toEqual({ message: 'Hello API' });
     });
   });
 });
