@@ -30,6 +30,45 @@ A hands-on event-driven, distributed system built with **NestJS**, **Prisma**, a
          │            Local-Queue            │
          │    (Simple Event Queue :3002)     │
          └───────────────────────────────────┘
+## Service Responsibilities
+
+### fake-auth
+**Authentication microservice.**  
+Provides login functionality with mock credentials, issues JWT tokens, and exposes a `/validate` endpoint for verifying those tokens. Used for securing access to other services via `Authorization` headers.
+
+### fake-priority
+**Mock external ERP API (e.g., Priority ERP).**  
+Simulates an external system by exposing endpoints to:
+- Fetch all or filtered invoices (`/invoices?updatedSince=...`)
+- Retrieve individual invoice data (`/invoices/:id`)
+- Download invoice PDF files (`/invoices/:id/pdf`)
+
+### local-queue
+**Minimal in-memory event queue.**  
+Acts as a placeholder for systems like RabbitMQ or Redis Streams. Allows event-based architecture: services push and consume invoice update events without direct coupling.
+
+### worker-priority
+**Poller worker for syncing invoices from fake-priority.**  
+Periodically checks `fake-priority` for new or updated invoices and sends those events to `local-queue` for downstream processing.
+
+### worker-prisma
+**Queue consumer and database updater.**  
+Listens for invoice events from `local-queue` and updates the internal database by calling `prisma-service`.
+
+### prisma-service
+**Database microservice with Prisma.**  
+Responsible for data persistence and queries. Exposes endpoints to:
+- Filter and paginate invoices
+- Upsert (insert/update) invoices into the database
+
+### api-gateway
+**Client-facing unified API.**  
+Acts as a secure API Gateway:
+- Verifies JWTs via `fake-auth`
+- Routes invoice read/write requests to `prisma-service`
+- Proxies PDF requests to `fake-priority`
+
+Clients interact only with this service.
 
 - **Fake-Auth**: (3000) Auth microservice, issues and validates JWTs.
 - **API Gateway**: (3006) Handles all client requests, validates JWT via Fake-Auth, proxies to internal services.
@@ -89,43 +128,3 @@ Worker-Priority	3003
 Worker-Prisma	3004
 Prisma-Service	3005
 API-Gateway	3006
-
-## Service Responsibilities
-
-### fake-auth
-**Authentication microservice.**  
-Provides login functionality with mock credentials, issues JWT tokens, and exposes a `/validate` endpoint for verifying those tokens. Used for securing access to other services via `Authorization` headers.
-
-### fake-priority
-**Mock external ERP API (e.g., Priority ERP).**  
-Simulates an external system by exposing endpoints to:
-- Fetch all or filtered invoices (`/invoices?updatedSince=...`)
-- Retrieve individual invoice data (`/invoices/:id`)
-- Download invoice PDF files (`/invoices/:id/pdf`)
-
-### local-queue
-**Minimal in-memory event queue.**  
-Acts as a placeholder for systems like RabbitMQ or Redis Streams. Allows event-based architecture: services push and consume invoice update events without direct coupling.
-
-### worker-priority
-**Poller worker for syncing invoices from fake-priority.**  
-Periodically checks `fake-priority` for new or updated invoices and sends those events to `local-queue` for downstream processing.
-
-### worker-prisma
-**Queue consumer and database updater.**  
-Listens for invoice events from `local-queue` and updates the internal database by calling `prisma-service`.
-
-### prisma-service
-**Database microservice with Prisma.**  
-Responsible for data persistence and queries. Exposes endpoints to:
-- Filter and paginate invoices
-- Upsert (insert/update) invoices into the database
-
-### api-gateway
-**Client-facing unified API.**  
-Acts as a secure API Gateway:
-- Verifies JWTs via `fake-auth`
-- Routes invoice read/write requests to `prisma-service`
-- Proxies PDF requests to `fake-priority`
-
-Clients interact only with this service.
