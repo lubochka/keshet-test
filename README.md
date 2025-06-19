@@ -1,83 +1,131 @@
-# PriorityLab
+# Priority Lab Microservices Monorepo
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A hands-on event-driven, distributed system built with **NestJS**, **Prisma**, and **Nx**, simulating a scalable, production-grade architecture for invoice synchronization with authentication and document handling.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+---
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/node?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## Architecture Overview
+              ┌─────────────────────────────┐
+              │         Client / UI         │
+              └──────────────┬──────────────┘
+                             │
+              ┌──────────────▼──────────────┐
+              │        API Gateway          │
+              │  (JWT, Filtering, Proxy)    │
+              │          :3006              │
+              └─────┬─────────────┬─────────┘
+                    │             │
+    ┌───────────────▼──┐      ┌───▼───────────────────┐
+    │  Prisma Service  │      │   Fake-Priority       │
+    │   (Invoices DB)  │      │   (Invoices & PDFs)   │
+    │       :3005      │      │        :3001          │
+    └────────┬─────────┘      └───┬───────────────────┘
+             │                    │
+    ┌────────▼────────────┐   ┌───▼──────────────┐
+    │  Worker-Prisma      │   │ Worker-Priority  │
+    │   (3004)           │   │   (3003)         │
+    └────────┬────────────┘   └────┬────────────┘
+             │                     │
+         ┌───▼───────────────────────────────┐
+         │            Local-Queue            │
+         │    (Simple Event Queue :3002)     │
+         └───────────────────────────────────┘
 
-## Finish your CI setup
+- **Fake-Auth**: (3000) Auth microservice, issues and validates JWTs.
+- **API Gateway**: (3006) Handles all client requests, validates JWT via Fake-Auth, proxies to internal services.
+- **Prisma Service**: (3005) Simple DB API (Invoices), uses Prisma/SQLite.
+- **Fake-Priority**: (3001) Simulates an external ERP (Priority) API, provides fake invoices & PDFs.
+- **Local-Queue**: (3002) In-memory event queue, used for event-driven sync.
+- **Worker-Priority**: (3003) Polls Fake-Priority, pushes invoice updates to Local-Queue.
+- **Worker-Prisma**: (3004) Pulls events from Local-Queue, upserts invoices in Prisma Service.
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/lof9pWQYVj)
+---
 
+## Why is This Architecture Scalable?
 
-## Run tasks
+- **Microservices:** Each concern (auth, API, ERP, queue, DB, background work) is a separately deployed app. You can scale them independently.
+- **Event-driven:** Sync is decoupled via the local-queue—swap it with Redis/RabbitMQ for real production workloads.
+- **API Gateway:** Single point for client validation, routing, and security. Makes adding more APIs/clients easy.
+- **Replaceable Services:** Simulate real third-party APIs, swap DBs, or swap queue types without rewriting the system.
+- **Clear Separation:** Each service is small, testable, and replaceable—critical for large teams or enterprise requirements.
 
-To run the dev server for your app, use:
+---
 
-```sh
-npx nx serve priority-lab
-```
+## Prerequisites
 
-To create a production bundle:
+- Node.js v18 or higher
+- npm v9 or higher
+- [NestJS CLI](https://docs.nestjs.com/cli/overview) and [Nx CLI](https://nx.dev/) (optional, but helpful)
+- Git (for code checkout)
 
-```sh
-npx nx build priority-lab
-```
+---
 
-To see all available targets to run for a project, run:
+## Setup & Running Locally
 
-```sh
-npx nx show project priority-lab
-```
+**1. Clone and install dependencies:**
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+git clone <your-repo-url>
+cd priority-lab
+npm install
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+**2. Generate Prisma Client and Migrate DB:**
 
-## Add new projects
+npx prisma generate
+npx prisma migrate dev --name init
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
+**3. Start each service in a separate terminal:**
+npx nx build fake-priority
+npx nx serve fake-priority
 
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/node:app demo
-```
-
-To generate a new library, use:
-
-```sh
-npx nx g @nx/node:lib mylib
-```
-
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
-
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+*Do this for each service, replacing the name (fake-priority) with:*
 
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+**Service Ports**
+Service	Port
+Fake-Auth	3000
+Fake-Priority	3001
+Local-Queue	3002
+Worker-Priority	3003
+Worker-Prisma	3004
+Prisma-Service	3005
+API-Gateway	3006
 
-## Install Nx Console
+## Service Responsibilities
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+### fake-auth
+**Authentication microservice.**  
+Provides login functionality with mock credentials, issues JWT tokens, and exposes a `/validate` endpoint for verifying those tokens. Used for securing access to other services via `Authorization` headers.
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### fake-priority
+**Mock external ERP API (e.g., Priority ERP).**  
+Simulates an external system by exposing endpoints to:
+- Fetch all or filtered invoices (`/invoices?updatedSince=...`)
+- Retrieve individual invoice data (`/invoices/:id`)
+- Download invoice PDF files (`/invoices/:id/pdf`)
 
-## Useful links
+### local-queue
+**Minimal in-memory event queue.**  
+Acts as a placeholder for systems like RabbitMQ or Redis Streams. Allows event-based architecture: services push and consume invoice update events without direct coupling.
 
-Learn more:
+### worker-priority
+**Poller worker for syncing invoices from fake-priority.**  
+Periodically checks `fake-priority` for new or updated invoices and sends those events to `local-queue` for downstream processing.
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/node?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### worker-prisma
+**Queue consumer and database updater.**  
+Listens for invoice events from `local-queue` and updates the internal database by calling `prisma-service`.
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-"# keshet-test" 
+### prisma-service
+**Database microservice with Prisma.**  
+Responsible for data persistence and queries. Exposes endpoints to:
+- Filter and paginate invoices
+- Upsert (insert/update) invoices into the database
+
+### api-gateway
+**Client-facing unified API.**  
+Acts as a secure API Gateway:
+- Verifies JWTs via `fake-auth`
+- Routes invoice read/write requests to `prisma-service`
+- Proxies PDF requests to `fake-priority`
+
+Clients interact only with this service.
