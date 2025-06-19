@@ -118,13 +118,14 @@ npx nx serve fake-priority
 
 *Do this for each service, replacing the name (fake-priority) with:*
 
+## Service Ports
 
-**Service Ports**
-Service	Port
-Fake-Auth	3000
-Fake-Priority	3001
-Local-Queue	3002
-Worker-Priority	3003
-Worker-Prisma	3004
-Prisma-Service	3005
-API-Gateway	3006
+| Service          | Port |
+|------------------|------|
+| Fake-Auth        | 3000 |
+| Fake-Priority    | 3001 |
+| Local-Queue      | 3002 |
+| Worker-Priority  | 3003 |
+| Worker-Prisma    | 3004 |
+| Prisma-Service   | 3005 |
+| API-Gateway      | 3006 |
