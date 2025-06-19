@@ -27,4 +27,13 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     };
   }
+
+   verifyToken(token: string) {
+    try {
+      // The secret MUST match what you use for signing!
+      return this.jwtService.verify(token, { secret: 'supersecret' });
+    } catch (e) {
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
 }
