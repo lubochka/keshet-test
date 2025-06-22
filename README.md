@@ -168,12 +168,12 @@ start "prisma-service" bash -c "npm run start:prisma-service; exec bash"
 sleep 5
 
 # Sync invoices from fake-priority
-echo "Triggering sync from fake-priority..."
+echo "Triggering sync from fake-priority - one document each time..."
 curl -X POST http://localhost:3004/api/worker/sync
 sleep 2
 
 # Process and save to DB via worker-prisma
-echo "Triggering process to save invoices to DB..."
+echo "Triggering process to save invoices to DB... - one document each time "
 curl -X POST http://localhost:3005/api/worker/process
 
 echo "✅ Demo environment initialized."
