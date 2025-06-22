@@ -129,6 +129,57 @@ npx nx serve fake-priority
 | Worker-Prisma    | 3004 |
 | Prisma-Service   | 3005 |
 | API-Gateway      | 3006 |
+### 🚀 Demo Startup Script
 
-## Bash script to run - copy to start-demo.sh
-<pre lang="markdown"> ### 🚀 Demo Startup Script The following Bash script launches each service in a **new command window** (on Windows), waits briefly between startups, and then triggers the data sync from `fake-priority` into the database. ```bash #!/bin/bash # Windows-specific: use 'start' to open new terminal windows echo "Starting fake-auth..." start "fake-auth" bash -c "npm run start:fake-auth; exec bash" sleep 2 echo "Starting fake-priority..." start "fake-priority" bash -c "npm run start:fake-priority; exec bash" sleep 2 echo "Starting local-queue..." start "local-queue" bash -c "npm run start:local-queue; exec bash" sleep 2 echo "Starting worker-priority..." start "worker-priority" bash -c "npm run start:worker-priority; exec bash" sleep 2 echo "Starting worker-prisma..." start "worker-prisma" bash -c "npm run start:worker-prisma; exec bash" sleep 2 echo "Starting prisma-service..." start "prisma-service" bash -c "npm run start:prisma-service; exec bash" sleep 5 # Trigger fake data sync echo "Triggering worker-priority to sync from fake-priority..." curl -X POST http://localhost:3004/api/worker/sync sleep 2 # Trigger worker-prisma to save to DB echo "Triggering worker-prisma to save to database..." curl -X POST http://localhost:3005/api/worker/process echo "✅ Demo initialization complete." ``` > 💡 If you're on macOS or Linux, replace `start` with `gnome-terminal -- bash -c` or another terminal command, or use background jobs and `tmux` for multi-terminal support. </pre>
+The following Bash script launches each service in a **new terminal window** (Windows), waits briefly between each, then triggers the data sync from `fake-priority` into the database.
+
+```bash
+#!/bin/bash
+
+# Start fake-auth
+echo "Starting fake-auth..."
+start "fake-auth" bash -c "npm run start:fake-auth; exec bash"
+sleep 2
+
+# Start fake-priority
+echo "Starting fake-priority..."
+start "fake-priority" bash -c "npm run start:fake-priority; exec bash"
+sleep 2
+
+# Start local-queue
+echo "Starting local-queue..."
+start "local-queue" bash -c "npm run start:local-queue; exec bash"
+sleep 2
+
+# Start worker-priority
+echo "Starting worker-priority..."
+start "worker-priority" bash -c "npm run start:worker-priority; exec bash"
+sleep 2
+
+# Start worker-prisma
+echo "Starting worker-prisma..."
+start "worker-prisma" bash -c "npm run start:worker-prisma; exec bash"
+sleep 2
+
+# Start prisma-service
+echo "Starting prisma-service..."
+start "prisma-service" bash -c "npm run start:prisma-service; exec bash"
+sleep 5
+
+# Sync invoices from fake-priority
+echo "Triggering sync from fake-priority..."
+curl -X POST http://localhost:3004/api/worker/sync
+sleep 2
+
+# Process and save to DB via worker-prisma
+echo "Triggering process to save invoices to DB..."
+curl -X POST http://localhost:3005/api/worker/process
+
+echo "✅ Demo environment initialized."
+```
+
+> 💡 **Note:**
+>
+> * This script is for **Windows (Git Bash or WSL)**.
+> * On macOS/Linux, replace `start "window-name" bash -c` with `gnome-terminal -- bash -c` or similar alternatives.
+> * Ensure `concurrently`, `nx`, and project dependencies are installed before running.
