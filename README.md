@@ -60,6 +60,7 @@ Listens for invoice events from `local-queue` and updates the internal database 
 Responsible for data persistence and queries. Exposes endpoints to:
 - Filter and paginate invoices
 - Upsert (insert/update) invoices into the database
+- For local demo at angular app, will connect to this service instead of api gateway which requires more complex setup. Therefore there is authguard on the query api calls
 
 ### api-gateway
 **Client-facing unified API.**  
