@@ -129,3 +129,50 @@ npx nx serve fake-priority
 | Worker-Prisma    | 3004 |
 | Prisma-Service   | 3005 |
 | API-Gateway      | 3006 |
+
+## Bash script to run - copy to start-demo.sh
+#!/bin/bash
+
+# Windows-specific: use 'start' to open new terminal windows
+
+echo "Starting fake-auth..."
+start "fake-auth" bash -c "npm run start:fake-auth; exec bash"
+
+sleep 2
+
+echo "Starting fake-priority..."
+start "fake-priority" bash -c "npm run start:fake-priority; exec bash"
+
+sleep 2
+
+echo "Starting local-queue..."
+start "local-queue" bash -c "npm run start:local-queue; exec bash"
+
+sleep 2
+
+echo "Starting worker-priority..."
+start "worker-priority" bash -c "npm run start:worker-priority; exec bash"
+
+sleep 2
+
+echo "Starting worker-prisma..."
+start "worker-prisma" bash -c "npm run start:worker-prisma; exec bash"
+
+sleep 2
+
+echo "Starting prisma-service..."
+start "prisma-service" bash -c "npm run start:prisma-service; exec bash"
+
+sleep 5
+
+# Trigger fake data sync
+echo "Triggering worker-priority to sync from fake-priority..."
+curl -X POST http://localhost:3004/api/worker/sync
+
+sleep 2
+
+# Trigger worker-prisma to save to DB
+echo "Triggering worker-prisma to save to database..."
+curl -X POST http://localhost:3005/api/worker/process
+
+echo "✅ Demo initialization complete."
