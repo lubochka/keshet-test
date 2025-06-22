@@ -38,8 +38,8 @@ export class InvoicesController {
    if (status) {
     filters.status = status;
   }
-    if (client) filters.client = { contains: client, mode: 'insensitive' };
-    if (title) filters.title = { contains: title, mode: 'insensitive' };
+    if (client) filters.client = { contains: client };
+    if (title) filters.title = { contains: title };
     if (dateFrom || dateTo) {
       filters.updatedAt = {};
       if (dateFrom) filters.updatedAt.gte = new Date(dateFrom);
@@ -50,11 +50,25 @@ export class InvoicesController {
     return this.invoiceService.getInvoices(filters, skip, take);
   }
 
-   @UseGuards(AuthGuard)
-   @Get(':id/pdf')
-  async getInvoicePdf(@Param('id') id: string, @Res() res: Response) {
-    await this.invoiceService.getInvoicePdf(id, res);
+  @UseGuards(AuthGuard)
+@Get('grouped/by-status')
+async countGroupedByStatus(
+  @Query('client') client?: string,
+  @Query('title') title?: string,
+  @Query('dateFrom') dateFrom?: string,
+  @Query('dateTo') dateTo?: string,
+) {
+  const filters: any = {};
+  if (client) filters.client = { contains: client };
+  if (title) filters.title = { contains: title };
+  if (dateFrom || dateTo) {
+    filters.updatedAt = {};
+    if (dateFrom) filters.updatedAt.gte = new Date(dateFrom);
+    if (dateTo) filters.updatedAt.lte = new Date(dateTo);
   }
+
+  return this.invoiceService.groupCountByStatus(filters);
+}
 
   
 }

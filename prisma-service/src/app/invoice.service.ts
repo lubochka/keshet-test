@@ -31,10 +31,16 @@ export class InvoiceService {
     ]);
     return { items, total };
   }
+  
+  async groupCountByStatus(filters: any) {
+  const result = await this.prisma.invoice.groupBy({
+    by: ['status'],
+    _count: true,
+    where: filters,
+  });
 
-  async getInvoicePdf(id: string, res: Response) {
-    const pdfRes = await axios.get(`http://localhost:3001/api/invoices/${id}/pdf`, { responseType: 'stream' });
-    res.setHeader('Content-Type', 'application/pdf');
-    pdfRes.data.pipe(res);
-  }
+  // Format result for clarity
+  return result.map(r => ({ status: r.status, count: r._count }));
 }
+}
+
