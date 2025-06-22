@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { InvoiceDto } from './model/invoice.dto';
+import { AuthGuard } from './auth.guard';
 
 @Controller('invoices')
 export class InvoicesController {
@@ -12,6 +13,7 @@ export class InvoicesController {
     return this.invoiceService.upsertInvoice(invoice);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   async getInvoices(
     @Query('client') client?: string,

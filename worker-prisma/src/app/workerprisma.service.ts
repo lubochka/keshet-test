@@ -23,7 +23,7 @@ export class WorkerPrismaService {
 
       // 2. If it's an invoice update, send to prisma-service
       if (event.type === 'invoice_updated') {
-        await axios.post('http://localhost:3005/api/invoices/upsert', event.payload);
+        await axios.post('http://localhost:3003/api/invoices/upsert', event.payload);
         this.logger.log(`Upserted invoice ${event.payload.id}`);
       }
       // Add more event types here if needed

@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, Res, UseGuards, Param } from '@nestjs/common';
+import { Controller, Get, Query,  Res, UseGuards, Param } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { InvoicesService,InvoiceQueryDto } from './app.service';
 import type { Response } from 'express';

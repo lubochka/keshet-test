@@ -64,6 +64,7 @@
       ]
     }
   ],
+
   "targetDefaults": {
     "test": {
       "dependsOn": ["^build"]

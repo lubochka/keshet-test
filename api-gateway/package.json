@@ -28,15 +28,15 @@
           "build"
         ],
         "options": {
-          "buildTarget": "@priority-lab/api-gateway:build",
+          "buildTarget": "@priority-lab/prisma-service:build",
           "runBuildTargetDependencies": false
         },
         "configurations": {
           "development": {
-            "buildTarget": "@priority-lab/api-gateway:build:development"
+            "buildTarget": "@priority-lab/prisma-service:build:development"
           },
           "production": {
-            "buildTarget": "@priority-lab/api-gateway:build:production"
+            "buildTarget": "@priority-lab/prisma-service:build:production"
           }
         }
       },

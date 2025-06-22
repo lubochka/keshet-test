@@ -10,7 +10,7 @@
     "start:worker-priority": "concurrently \"npx nx build worker-priority\" \"npx nx serve worker-priority\"",
     "start:worker-prisma": "concurrently \"npx nx build worker-prisma\" \"npx nx serve worker-prisma\"",
     "start:prisma-service": "concurrently  \"npx nx build prisma-service\" \"npx nx serve prisma-service\"",
-    "start:api-gateway": "concurrently \"npx nx build api-gateway\" \"npx nx serve api-gateway\""
+    "start:api-gateway": "concurrently \"npx nx build api-gateway\" \"npx nx serve api-gateway \""
   },
   "private": true,
   "dependencies": {

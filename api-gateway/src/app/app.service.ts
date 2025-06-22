@@ -13,12 +13,12 @@ export class InvoiceQueryDto {
 @Injectable()
 export class InvoicesService {
   async listInvoices(query: InvoiceQueryDto) {
-    const { data } = await axios.get('http://localhost:3005/invoices', { params: query });
+    const { data } = await axios.get('http://localhost:3003/api/invoices', { params: query });
     return data;
   }
 
   async getInvoice(id: string) {
-    const { data } = await axios.get(`http://localhost:3005/invoices`, { params: { id } });
+    const { data } = await axios.get(`http://localhost:3003/api/invoices`, { params: { id } });
     if (Array.isArray(data.items)) {
       return data.items[0] || {};
     }
@@ -26,7 +26,7 @@ export class InvoicesService {
   }
 
   async getInvoicePdf(id: string, res: Response) {
-    const pdfRes = await axios.get(`http://localhost:3001/invoices/${id}/pdf`, { responseType: 'stream' });
+    const pdfRes = await axios.get(`http://localhost:3001/api/invoices/${id}/pdf`, { responseType: 'stream' });
     res.setHeader('Content-Type', 'application/pdf');
     pdfRes.data.pipe(res);
   }
